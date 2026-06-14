@@ -1,0 +1,53 @@
+CREATE TABLE operations
+(
+    id               UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
+    user_id          UUID        NOT NULL REFERENCES users (id),
+    account_id       UUID        NOT NULL REFERENCES investment_accounts (id),
+    asset_id         UUID        NOT NULL REFERENCES assets (id),
+    operation_type   VARCHAR(20) NOT NULL,
+    operation_date   TIMESTAMPTZ NOT NULL,
+    quantity         NUMERIC(19, 8),
+    unit_price       NUMERIC(19, 8),
+    gross_amount     NUMERIC(19, 8),
+    net_amount       NUMERIC(19, 8),
+    fees_amount      NUMERIC(19, 8),
+    currency         VARCHAR(3)  NOT NULL,
+    source_type      VARCHAR(20) NOT NULL,
+    source_reference VARCHAR(255),
+    notes            TEXT,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_operations_type CHECK (
+        operation_type IN ('BUY', 'SELL', 'APPLICATION', 'REDEMPTION')
+        ),
+    CONSTRAINT chk_operations_currency_format CHECK (
+        char_length(currency) = 3 AND currency = upper(currency)
+        ),
+    CONSTRAINT chk_operations_source_type CHECK (
+        source_type IN ('MANUAL', 'IMPORTED')
+        ),
+    CONSTRAINT chk_operations_quantity_non_negative CHECK (
+        quantity IS NULL OR quantity >= 0
+        ),
+    CONSTRAINT chk_operations_unit_price_non_negative CHECK (
+        unit_price IS NULL OR unit_price >= 0
+        ),
+    CONSTRAINT chk_operations_gross_amount_non_negative CHECK (
+        gross_amount IS NULL OR gross_amount >= 0
+        ),
+    CONSTRAINT chk_operations_net_amount_non_negative CHECK (
+        net_amount IS NULL OR net_amount >= 0
+        ),
+    CONSTRAINT chk_operations_fees_amount_non_negative CHECK (
+        fees_amount IS NULL OR fees_amount >= 0
+        ),
+    CONSTRAINT chk_operations_source_reference_not_blank CHECK (
+        source_reference IS NULL OR btrim(source_reference) <> ''
+        )
+);
+
+CREATE INDEX idx_operations_user_id ON operations (user_id);
+CREATE INDEX idx_operations_account_id ON operations (account_id);
+CREATE INDEX idx_operations_asset_id ON operations (asset_id);
+CREATE INDEX idx_operations_user_asset_date ON operations (user_id, asset_id, operation_date DESC);
