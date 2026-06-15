@@ -6,6 +6,7 @@ import com.gard.investmentmanager.asset.application.port.out.AssetPersistencePor
 import com.gard.investmentmanager.asset.domain.Asset;
 import com.gard.investmentmanager.shared.application.port.out.LoadUserPort;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -16,20 +17,25 @@ public class CreateAssetService implements CreateAssetUC {
 
     private final AssetPersistencePort assetPersistencePort;
     private final LoadUserPort loadUserPort;
+    private final MessageResolver messageResolver;
 
     public CreateAssetService(
             AssetPersistencePort assetPersistencePort,
-            LoadUserPort loadUserPort
+            LoadUserPort loadUserPort,
+            MessageResolver messageResolver
     ) {
         this.assetPersistencePort = assetPersistencePort;
         this.loadUserPort = loadUserPort;
+        this.messageResolver = messageResolver;
     }
 
     @Override
     @Transactional
     public Asset execute(CreateAssetCommand command) {
         if (!loadUserPort.existsById(command.userId())) {
-            throw new ResourceNotFoundException("User not found: " + command.userId());
+            throw new ResourceNotFoundException(
+                    messageResolver.get("error.user.not-found", command.userId())
+            );
         }
 
         Instant now = Instant.now();

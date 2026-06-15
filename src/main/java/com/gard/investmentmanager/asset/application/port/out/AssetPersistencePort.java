@@ -13,5 +13,5 @@ public interface AssetPersistencePort {
 
     Asset save(Asset asset);
 
-    void deleteById(Long assetId);
+    void softDeleteById(Long assetId);
 }

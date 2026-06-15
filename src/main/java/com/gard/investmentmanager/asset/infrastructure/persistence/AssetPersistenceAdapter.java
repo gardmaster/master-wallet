@@ -4,9 +4,11 @@ import com.gard.investmentmanager.asset.application.port.out.AssetPersistencePor
 import com.gard.investmentmanager.asset.domain.Asset;
 import com.gard.investmentmanager.auth.infrastructure.persistence.UserEntity;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,15 +18,18 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
     private final AssetPanacheRepository assetPanacheRepository;
     private final AssetPersistenceMapper assetPersistenceMapper;
     private final EntityManager entityManager;
+    private final MessageResolver messageResolver;
 
     public AssetPersistenceAdapter(
             AssetPanacheRepository assetPanacheRepository,
             AssetPersistenceMapper assetPersistenceMapper,
-            EntityManager entityManager
+            EntityManager entityManager,
+            MessageResolver messageResolver
     ) {
         this.assetPanacheRepository = assetPanacheRepository;
         this.assetPersistenceMapper = assetPersistenceMapper;
         this.entityManager = entityManager;
+        this.messageResolver = messageResolver;
     }
 
     @Override
@@ -34,7 +39,7 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
 
     @Override
     public Optional<Asset> findById(Long assetId) {
-        return assetPanacheRepository.findByIdOptional(assetId)
+        return assetPanacheRepository.findActiveByIdOptional(assetId)
                 .map(assetPersistenceMapper::toDomain);
     }
 
@@ -45,8 +50,10 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
         if (asset.id() == null) {
             entity = new AssetEntity();
         } else {
-            entity = assetPanacheRepository.findByIdOptional(asset.id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Asset not found: " + asset.id()));
+            entity = assetPanacheRepository.findActiveByIdOptional(asset.id())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            messageResolver.get("error.asset.not-found", asset.id())
+                    ));
         }
 
         entity.user = entityManager.getReference(UserEntity.class, asset.userId());
@@ -69,7 +76,7 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
     }
 
     @Override
-    public void deleteById(Long assetId) {
-        assetPanacheRepository.deleteById(assetId);
+    public void softDeleteById(Long assetId) {
+        assetPanacheRepository.softDeleteById(assetId, Instant.now());
     }
 }

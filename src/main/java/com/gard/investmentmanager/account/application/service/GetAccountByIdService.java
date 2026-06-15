@@ -4,20 +4,28 @@ import com.gard.investmentmanager.account.application.port.in.GetAccountByIdUC;
 import com.gard.investmentmanager.account.application.port.out.AccountPersistencePort;
 import com.gard.investmentmanager.account.domain.InvestmentAccount;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class GetAccountByIdService implements GetAccountByIdUC {
 
     private final AccountPersistencePort accountPersistencePort;
+    private final MessageResolver messageResolver;
 
-    public GetAccountByIdService(AccountPersistencePort accountPersistencePort) {
+    public GetAccountByIdService(
+            AccountPersistencePort accountPersistencePort,
+            MessageResolver messageResolver
+    ) {
         this.accountPersistencePort = accountPersistencePort;
+        this.messageResolver = messageResolver;
     }
 
     @Override
     public InvestmentAccount execute(Long accountId) {
         return accountPersistencePort.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found: " + accountId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        messageResolver.get("error.account.not-found", accountId)
+                ));
     }
 }

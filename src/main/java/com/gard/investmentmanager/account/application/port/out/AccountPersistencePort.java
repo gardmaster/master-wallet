@@ -13,5 +13,5 @@ public interface AccountPersistencePort {
 
     InvestmentAccount save(InvestmentAccount account);
 
-    void deleteById(Long accountId);
+    void softDeleteById(Long accountId);
 }

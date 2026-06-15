@@ -6,6 +6,7 @@ import com.gard.investmentmanager.institution.application.port.out.InstitutionPe
 import com.gard.investmentmanager.institution.domain.Institution;
 import com.gard.investmentmanager.shared.application.port.out.LoadUserPort;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -16,20 +17,25 @@ public class CreateInstitutionService implements CreateInstitutionUC {
 
     private final InstitutionPersistencePort institutionPersistencePort;
     private final LoadUserPort loadUserPort;
+    private final MessageResolver messageResolver;
 
     public CreateInstitutionService(
             InstitutionPersistencePort institutionPersistencePort,
-            LoadUserPort loadUserPort
+            LoadUserPort loadUserPort,
+            MessageResolver messageResolver
     ) {
         this.institutionPersistencePort = institutionPersistencePort;
         this.loadUserPort = loadUserPort;
+        this.messageResolver = messageResolver;
     }
 
     @Override
     @Transactional
     public Institution execute(CreateInstitutionCommand command) {
         if (!loadUserPort.existsById(command.userId())) {
-            throw new ResourceNotFoundException("User not found: " + command.userId());
+            throw new ResourceNotFoundException(
+                    messageResolver.get("error.user.not-found", command.userId())
+            );
         }
 
         Instant now = Instant.now();

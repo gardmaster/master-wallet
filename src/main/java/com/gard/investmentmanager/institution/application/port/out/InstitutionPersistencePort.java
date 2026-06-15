@@ -13,5 +13,5 @@ public interface InstitutionPersistencePort {
 
     Institution save(Institution institution);
 
-    void deleteById(Long institutionId);
+    void softDeleteById(Long institutionId);
 }

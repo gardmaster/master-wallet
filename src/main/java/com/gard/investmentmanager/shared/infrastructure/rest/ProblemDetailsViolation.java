@@ -1,7 +1,7 @@
 package com.gard.investmentmanager.shared.infrastructure.rest;
 
-public record ApiErrorResponse(
-        String code,
+public record ProblemDetailsViolation(
+        String field,
         String message
 ) {
 }

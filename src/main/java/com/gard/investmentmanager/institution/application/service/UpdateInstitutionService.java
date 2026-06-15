@@ -5,6 +5,7 @@ import com.gard.investmentmanager.institution.application.port.in.UpdateInstitut
 import com.gard.investmentmanager.institution.application.port.out.InstitutionPersistencePort;
 import com.gard.investmentmanager.institution.domain.Institution;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -14,16 +15,23 @@ import java.time.Instant;
 public class UpdateInstitutionService implements UpdateInstitutionUC {
 
     private final InstitutionPersistencePort institutionPersistencePort;
+    private final MessageResolver messageResolver;
 
-    public UpdateInstitutionService(InstitutionPersistencePort institutionPersistencePort) {
+    public UpdateInstitutionService(
+            InstitutionPersistencePort institutionPersistencePort,
+            MessageResolver messageResolver
+    ) {
         this.institutionPersistencePort = institutionPersistencePort;
+        this.messageResolver = messageResolver;
     }
 
     @Override
     @Transactional
     public Institution execute(Long institutionId, UpdateInstitutionCommand command) {
         Institution current = institutionPersistencePort.findById(institutionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Institution not found: " + institutionId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        messageResolver.get("error.institution.not-found", institutionId)
+                ));
 
         Institution updated = new Institution(
                 current.id(),

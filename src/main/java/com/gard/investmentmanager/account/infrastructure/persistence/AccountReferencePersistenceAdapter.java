@@ -1,7 +1,6 @@
 package com.gard.investmentmanager.account.infrastructure.persistence;
 
 import com.gard.investmentmanager.account.application.port.out.LoadAccountReferencePort;
-import com.gard.investmentmanager.institution.infrastructure.persistence.InstitutionEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
@@ -21,6 +20,7 @@ public class AccountReferencePersistenceAdapter implements LoadAccountReferenceP
                 from InstitutionEntity i
                 where i.id = :institutionId
                   and i.user.id = :userId
+                  and i.deletedAt is null
                 """, Long.class)
                 .setParameter("institutionId", institutionId)
                 .setParameter("userId", userId)

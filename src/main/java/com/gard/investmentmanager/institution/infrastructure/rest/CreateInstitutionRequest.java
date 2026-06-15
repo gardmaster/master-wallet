@@ -6,9 +6,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record CreateInstitutionRequest(
-        @NotNull Long userId,
-        @NotBlank @Size(max = 150) String name,
-        @NotNull InstitutionType institutionType,
+        @NotNull(message = "{validation.not-null}")
+        Long userId,
+
+        @NotBlank(message = "{validation.not-blank}")
+        @Size(max = 150, message = "{validation.size.max}")
+        String name,
+
+        @NotNull(message = "{validation.not-null}")
+        InstitutionType institutionType,
+
         String notes
 ) {
 }

@@ -5,9 +5,11 @@ import com.gard.investmentmanager.account.domain.InvestmentAccount;
 import com.gard.investmentmanager.auth.infrastructure.persistence.UserEntity;
 import com.gard.investmentmanager.institution.infrastructure.persistence.InstitutionEntity;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,15 +19,18 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     private final AccountPanacheRepository accountPanacheRepository;
     private final AccountPersistenceMapper accountPersistenceMapper;
     private final EntityManager entityManager;
+    private final MessageResolver messageResolver;
 
     public AccountPersistenceAdapter(
             AccountPanacheRepository accountPanacheRepository,
             AccountPersistenceMapper accountPersistenceMapper,
-            EntityManager entityManager
+            EntityManager entityManager,
+            MessageResolver messageResolver
     ) {
         this.accountPanacheRepository = accountPanacheRepository;
         this.accountPersistenceMapper = accountPersistenceMapper;
         this.entityManager = entityManager;
+        this.messageResolver = messageResolver;
     }
 
     @Override
@@ -35,7 +40,7 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
 
     @Override
     public Optional<InvestmentAccount> findById(Long accountId) {
-        return accountPanacheRepository.findByIdOptional(accountId)
+        return accountPanacheRepository.findActiveByIdOptional(accountId)
                 .map(accountPersistenceMapper::toDomain);
     }
 
@@ -46,8 +51,10 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
         if (account.id() == null) {
             entity = new InvestmentAccountEntity();
         } else {
-            entity = accountPanacheRepository.findByIdOptional(account.id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found: " + account.id()));
+            entity = accountPanacheRepository.findActiveByIdOptional(account.id())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            messageResolver.get("error.account.not-found", account.id())
+                    ));
         }
 
         entity.user = entityManager.getReference(UserEntity.class, account.userId());
@@ -68,7 +75,7 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     }
 
     @Override
-    public void deleteById(Long accountId) {
-        accountPanacheRepository.deleteById(accountId);
+    public void softDeleteById(Long accountId) {
+        accountPanacheRepository.softDeleteById(accountId, Instant.now());
     }
 }

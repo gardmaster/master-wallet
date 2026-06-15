@@ -43,4 +43,7 @@ public class InstitutionEntity {
 
     @Column(name = "updated_at", nullable = false)
     public Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    public Instant deletedAt;
 }

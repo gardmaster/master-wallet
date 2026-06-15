@@ -8,6 +8,7 @@ import com.gard.investmentmanager.account.domain.InvestmentAccount;
 import com.gard.investmentmanager.shared.application.port.out.LoadUserPort;
 import com.gard.investmentmanager.shared.domain.BusinessException;
 import com.gard.investmentmanager.shared.domain.ResourceNotFoundException;
+import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -19,26 +20,33 @@ public class CreateAccountService implements CreateAccountUC {
     private final AccountPersistencePort accountPersistencePort;
     private final LoadAccountReferencePort loadAccountReferencePort;
     private final LoadUserPort loadUserPort;
+    private final MessageResolver messageResolver;
 
     public CreateAccountService(
             AccountPersistencePort accountPersistencePort,
             LoadAccountReferencePort loadAccountReferencePort,
-            LoadUserPort loadUserPort
+            LoadUserPort loadUserPort,
+            MessageResolver messageResolver
     ) {
         this.accountPersistencePort = accountPersistencePort;
         this.loadAccountReferencePort = loadAccountReferencePort;
         this.loadUserPort = loadUserPort;
+        this.messageResolver = messageResolver;
     }
 
     @Override
     @Transactional
     public InvestmentAccount execute(CreateAccountCommand command) {
         if (!loadUserPort.existsById(command.userId())) {
-            throw new ResourceNotFoundException("User not found: " + command.userId());
+            throw new ResourceNotFoundException(
+                    messageResolver.get("error.user.not-found", command.userId())
+            );
         }
 
         if (!loadAccountReferencePort.institutionBelongsToUser(command.institutionId(), command.userId())) {
-            throw new BusinessException("Institution does not belong to user: " + command.institutionId());
+            throw new BusinessException(
+                    messageResolver.get("error.institution.not-belong-to-user", command.institutionId())
+            );
         }
 
         Instant now = Instant.now();
