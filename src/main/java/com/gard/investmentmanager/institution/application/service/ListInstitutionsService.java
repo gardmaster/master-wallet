@@ -1,7 +1,7 @@
 package com.gard.investmentmanager.institution.application.service;
 
 import com.gard.investmentmanager.institution.application.port.in.ListInstitutionsUC;
-import com.gard.investmentmanager.institution.application.port.out.LoadInstitutionsPort;
+import com.gard.investmentmanager.institution.application.port.out.InstitutionPersistencePort;
 import com.gard.investmentmanager.institution.domain.Institution;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -10,14 +10,14 @@ import java.util.List;
 @ApplicationScoped
 public class ListInstitutionsService implements ListInstitutionsUC {
 
-    private final LoadInstitutionsPort loadInstitutionsPort;
+    private final InstitutionPersistencePort institutionPersistencePort;
 
-    public ListInstitutionsService(LoadInstitutionsPort loadInstitutionsPort) {
-        this.loadInstitutionsPort = loadInstitutionsPort;
+    public ListInstitutionsService(InstitutionPersistencePort institutionPersistencePort) {
+        this.institutionPersistencePort = institutionPersistencePort;
     }
 
     @Override
     public List<Institution> execute() {
-        return loadInstitutionsPort.loadAllOrderedByName();
+        return institutionPersistencePort.findAllOrderedByName();
     }
 }
