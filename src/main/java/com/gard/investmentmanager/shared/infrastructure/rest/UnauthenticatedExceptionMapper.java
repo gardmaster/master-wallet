@@ -3,7 +3,6 @@ package com.gard.investmentmanager.shared.infrastructure.rest;
 import com.gard.investmentmanager.shared.domain.UnauthenticatedException;
 import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
@@ -11,8 +10,11 @@ import jakarta.ws.rs.ext.Provider;
 @ApplicationScoped
 public class UnauthenticatedExceptionMapper extends BaseProblemDetailsExceptionMapper<UnauthenticatedException> {
 
-    @Inject
-    MessageResolver messageResolver;
+    private final MessageResolver messageResolver;
+
+    public UnauthenticatedExceptionMapper(MessageResolver messageResolver) {
+        this.messageResolver = messageResolver;
+    }
 
     @Override
     public Response toResponse(UnauthenticatedException exception) {

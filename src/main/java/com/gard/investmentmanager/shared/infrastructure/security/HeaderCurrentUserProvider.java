@@ -6,7 +6,6 @@ import com.gard.investmentmanager.shared.domain.UnauthenticatedException;
 import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import com.gard.investmentmanager.shared.infrastructure.rest.RequestHeaderNames;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 
@@ -16,8 +15,11 @@ public class HeaderCurrentUserProvider implements CurrentUserProvider {
     @Context
     HttpHeaders httpHeaders;
 
-    @Inject
-    MessageResolver messageResolver;
+    private final MessageResolver messageResolver;
+
+    public HeaderCurrentUserProvider(MessageResolver messageResolver) {
+        this.messageResolver = messageResolver;
+    }
 
     @Override
     public CurrentUser getCurrentUser() {
