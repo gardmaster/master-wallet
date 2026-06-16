@@ -4,5 +4,5 @@ import com.gard.investmentmanager.account.domain.InvestmentAccount;
 
 public interface GetAccountByIdUC {
 
-    InvestmentAccount execute(Long accountId);
+    InvestmentAccount execute(Long currentUserId, Long accountId);
 }

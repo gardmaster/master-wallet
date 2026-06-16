@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ListInstitutionsUC {
 
-    List<Institution> execute();
+    List<Institution> execute(Long currentUserId);
 }

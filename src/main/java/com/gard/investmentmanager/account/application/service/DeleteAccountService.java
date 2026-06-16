@@ -23,13 +23,13 @@ public class DeleteAccountService implements DeleteAccountUC {
 
     @Override
     @Transactional
-    public void execute(Long accountId) {
-        if (accountPersistencePort.findById(accountId).isEmpty()) {
+    public void execute(Long currentUserId, Long accountId) {
+        if (accountPersistencePort.findByIdAndUserId(accountId, currentUserId).isEmpty()) {
             throw new ResourceNotFoundException(
                     messageResolver.get("error.account.not-found", accountId)
             );
         }
 
-        accountPersistencePort.softDeleteById(accountId);
+        accountPersistencePort.softDeleteById(accountId, currentUserId);
     }
 }

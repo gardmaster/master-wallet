@@ -23,13 +23,13 @@ public class DeleteAssetService implements DeleteAssetUC {
 
     @Override
     @Transactional
-    public void execute(Long assetId) {
-        if (assetPersistencePort.findById(assetId).isEmpty()) {
+    public void execute(Long currentUserId, Long assetId) {
+        if (assetPersistencePort.findByIdAndUserId(assetId, currentUserId).isEmpty()) {
             throw new ResourceNotFoundException(
                     messageResolver.get("error.asset.not-found", assetId)
             );
         }
 
-        assetPersistencePort.softDeleteById(assetId);
+        assetPersistencePort.softDeleteById(assetId, currentUserId);
     }
 }

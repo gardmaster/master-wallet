@@ -33,13 +33,15 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
     }
 
     @Override
-    public List<Asset> findAllOrderedByName() {
-        return assetPersistenceMapper.toDomainList(assetPanacheRepository.listAllOrderedByName());
+    public List<Asset> findAllOrderedByUserIdAndName(Long userId) {
+        return assetPersistenceMapper.toDomainList(
+                assetPanacheRepository.listAllOrderedByUserIdAndName(userId)
+        );
     }
 
     @Override
-    public Optional<Asset> findById(Long assetId) {
-        return assetPanacheRepository.findActiveByIdOptional(assetId)
+    public Optional<Asset> findByIdAndUserId(Long assetId, Long userId) {
+        return assetPanacheRepository.findActiveByIdAndUserIdOptional(assetId, userId)
                 .map(assetPersistenceMapper::toDomain);
     }
 
@@ -50,7 +52,7 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
         if (asset.id() == null) {
             entity = new AssetEntity();
         } else {
-            entity = assetPanacheRepository.findActiveByIdOptional(asset.id())
+            entity = assetPanacheRepository.findActiveByIdAndUserIdOptional(asset.id(), asset.userId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             messageResolver.get("error.asset.not-found", asset.id())
                     ));
@@ -76,7 +78,7 @@ public class AssetPersistenceAdapter implements AssetPersistencePort {
     }
 
     @Override
-    public void softDeleteById(Long assetId) {
-        assetPanacheRepository.softDeleteById(assetId, Instant.now());
+    public void softDeleteById(Long assetId, Long userId) {
+        assetPanacheRepository.softDeleteById(assetId, userId, Instant.now());
     }
 }

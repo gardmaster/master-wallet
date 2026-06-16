@@ -22,8 +22,8 @@ public class GetInstitutionByIdService implements GetInstitutionByIdUC {
     }
 
     @Override
-    public Institution execute(Long institutionId) {
-        return institutionPersistencePort.findById(institutionId)
+    public Institution execute(Long currentUserId, Long institutionId) {
+        return institutionPersistencePort.findByIdAndUserId(institutionId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.institution.not-found", institutionId)
                 ));

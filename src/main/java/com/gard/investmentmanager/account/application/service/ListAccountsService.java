@@ -17,7 +17,7 @@ public class ListAccountsService implements ListAccountsUC {
     }
 
     @Override
-    public List<InvestmentAccount> execute() {
-        return accountPersistencePort.findAllOrderedByName();
+    public List<InvestmentAccount> execute(Long currentUserId) {
+        return accountPersistencePort.findAllOrderedByUserIdAndName(currentUserId);
     }
 }

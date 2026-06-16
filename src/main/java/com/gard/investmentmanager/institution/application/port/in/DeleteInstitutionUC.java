@@ -2,5 +2,5 @@ package com.gard.investmentmanager.institution.application.port.in;
 
 public interface DeleteInstitutionUC {
 
-    void execute(Long institutionId);
+    void execute(Long currentUserId, Long institutionId);
 }

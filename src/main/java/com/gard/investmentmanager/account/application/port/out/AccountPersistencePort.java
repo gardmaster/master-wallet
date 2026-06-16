@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface AccountPersistencePort {
 
-    List<InvestmentAccount> findAllOrderedByName();
+    List<InvestmentAccount> findAllOrderedByUserIdAndName(Long userId);
 
-    Optional<InvestmentAccount> findById(Long accountId);
+    Optional<InvestmentAccount> findByIdAndUserId(Long accountId, Long userId);
 
     InvestmentAccount save(InvestmentAccount account);
 
-    void softDeleteById(Long accountId);
+    void softDeleteById(Long accountId, Long userId);
 }

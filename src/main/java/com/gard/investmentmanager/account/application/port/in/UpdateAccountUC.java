@@ -4,5 +4,5 @@ import com.gard.investmentmanager.account.domain.InvestmentAccount;
 
 public interface UpdateAccountUC {
 
-    InvestmentAccount execute(Long accountId, UpdateAccountCommand command);
+    InvestmentAccount execute(Long currentUserId, Long accountId, UpdateAccountCommand command);
 }

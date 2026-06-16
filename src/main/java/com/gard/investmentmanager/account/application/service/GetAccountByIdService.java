@@ -22,8 +22,8 @@ public class GetAccountByIdService implements GetAccountByIdUC {
     }
 
     @Override
-    public InvestmentAccount execute(Long accountId) {
-        return accountPersistencePort.findById(accountId)
+    public InvestmentAccount execute(Long currentUserId, Long accountId) {
+        return accountPersistencePort.findByIdAndUserId(accountId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.account.not-found", accountId)
                 ));

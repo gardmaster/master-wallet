@@ -4,5 +4,5 @@ import com.gard.investmentmanager.institution.domain.Institution;
 
 public interface GetInstitutionByIdUC {
 
-    Institution execute(Long institutionId);
+    Institution execute(Long currentUserId, Long institutionId);
 }

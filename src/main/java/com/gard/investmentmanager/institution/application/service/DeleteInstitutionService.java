@@ -23,13 +23,13 @@ public class DeleteInstitutionService implements DeleteInstitutionUC {
 
     @Override
     @Transactional
-    public void execute(Long institutionId) {
-        if (institutionPersistencePort.findById(institutionId).isEmpty()) {
+    public void execute(Long currentUserId, Long institutionId) {
+        if (institutionPersistencePort.findByIdAndUserId(institutionId, currentUserId).isEmpty()) {
             throw new ResourceNotFoundException(
                     messageResolver.get("error.institution.not-found", institutionId)
             );
         }
 
-        institutionPersistencePort.softDeleteById(institutionId);
+        institutionPersistencePort.softDeleteById(institutionId, currentUserId);
     }
 }

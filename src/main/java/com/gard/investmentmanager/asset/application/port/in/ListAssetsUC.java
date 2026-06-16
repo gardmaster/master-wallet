@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ListAssetsUC {
 
-    List<Asset> execute();
+    List<Asset> execute(Long currentUserId);
 }

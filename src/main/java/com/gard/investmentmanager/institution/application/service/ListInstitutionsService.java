@@ -17,7 +17,7 @@ public class ListInstitutionsService implements ListInstitutionsUC {
     }
 
     @Override
-    public List<Institution> execute() {
-        return institutionPersistencePort.findAllOrderedByName();
+    public List<Institution> execute(Long currentUserId) {
+        return institutionPersistencePort.findAllOrderedByUserIdAndName(currentUserId);
     }
 }

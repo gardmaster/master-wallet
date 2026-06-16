@@ -34,13 +34,15 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     }
 
     @Override
-    public List<InvestmentAccount> findAllOrderedByName() {
-        return accountPersistenceMapper.toDomainList(accountPanacheRepository.listAllOrderedByName());
+    public List<InvestmentAccount> findAllOrderedByUserIdAndName(Long userId) {
+        return accountPersistenceMapper.toDomainList(
+                accountPanacheRepository.listAllOrderedByUserIdAndName(userId)
+        );
     }
 
     @Override
-    public Optional<InvestmentAccount> findById(Long accountId) {
-        return accountPanacheRepository.findActiveByIdOptional(accountId)
+    public Optional<InvestmentAccount> findByIdAndUserId(Long accountId, Long userId) {
+        return accountPanacheRepository.findActiveByIdAndUserIdOptional(accountId, userId)
                 .map(accountPersistenceMapper::toDomain);
     }
 
@@ -51,7 +53,7 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
         if (account.id() == null) {
             entity = new InvestmentAccountEntity();
         } else {
-            entity = accountPanacheRepository.findActiveByIdOptional(account.id())
+            entity = accountPanacheRepository.findActiveByIdAndUserIdOptional(account.id(), account.userId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             messageResolver.get("error.account.not-found", account.id())
                     ));
@@ -75,7 +77,7 @@ public class AccountPersistenceAdapter implements AccountPersistencePort {
     }
 
     @Override
-    public void softDeleteById(Long accountId) {
-        accountPanacheRepository.softDeleteById(accountId, Instant.now());
+    public void softDeleteById(Long accountId, Long userId) {
+        accountPanacheRepository.softDeleteById(accountId, userId, Instant.now());
     }
 }

@@ -31,10 +31,10 @@ public class CreateAssetService implements CreateAssetUC {
 
     @Override
     @Transactional
-    public Asset execute(CreateAssetCommand command) {
-        if (!loadUserPort.existsById(command.userId())) {
+    public Asset execute(Long currentUserId, CreateAssetCommand command) {
+        if (!loadUserPort.existsById(currentUserId)) {
             throw new ResourceNotFoundException(
-                    messageResolver.get("error.user.not-found", command.userId())
+                    messageResolver.get("error.user.not-found", currentUserId)
             );
         }
 
@@ -42,7 +42,7 @@ public class CreateAssetService implements CreateAssetUC {
 
         Asset asset = new Asset(
                 null,
-                command.userId(),
+                currentUserId,
                 command.assetType(),
                 command.name().trim(),
                 normalizeNullable(command.ticker()),

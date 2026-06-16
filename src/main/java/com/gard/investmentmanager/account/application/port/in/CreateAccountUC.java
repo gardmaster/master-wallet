@@ -4,5 +4,5 @@ import com.gard.investmentmanager.account.domain.InvestmentAccount;
 
 public interface CreateAccountUC {
 
-    InvestmentAccount execute(CreateAccountCommand command);
+    InvestmentAccount execute(Long currentUserId, CreateAccountCommand command);
 }

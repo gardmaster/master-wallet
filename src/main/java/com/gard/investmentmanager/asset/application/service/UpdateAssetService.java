@@ -27,8 +27,8 @@ public class UpdateAssetService implements UpdateAssetUC {
 
     @Override
     @Transactional
-    public Asset execute(Long assetId, UpdateAssetCommand command) {
-        Asset current = assetPersistencePort.findById(assetId)
+    public Asset execute(Long currentUserId, Long assetId, UpdateAssetCommand command) {
+        Asset current = assetPersistencePort.findByIdAndUserId(assetId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.asset.not-found", assetId)
                 ));

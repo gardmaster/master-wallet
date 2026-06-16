@@ -2,5 +2,5 @@ package com.gard.investmentmanager.asset.application.port.in;
 
 public interface DeleteAssetUC {
 
-    void execute(Long assetId);
+    void execute(Long currentUserId, Long assetId);
 }
