@@ -1,34 +1,29 @@
 package com.gard.investmentmanager.shared.infrastructure.security;
 
-import com.gard.investmentmanager.shared.application.port.in.CurrentUserProvider;
+import com.gard.investmentmanager.shared.application.port.out.LoadCurrentUserPort;
 import com.gard.investmentmanager.shared.domain.CurrentUser;
 import com.gard.investmentmanager.shared.domain.UnauthenticatedException;
 import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.RequestScoped;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
-public class TokenCurrentUserProvider implements CurrentUserProvider {
+public class TokenCurrentUserProvider {
 
     private final SecurityIdentity securityIdentity;
+    private final LoadCurrentUserPort loadCurrentUserPort;
     private final MessageResolver messageResolver;
-    private final String userIdClaim;
-    private final String subjectClaim;
 
     public TokenCurrentUserProvider(
             SecurityIdentity securityIdentity,
-            MessageResolver messageResolver,
-            @ConfigProperty(name = "app.security.current-user.claim") String userIdClaim,
-            @ConfigProperty(name = "app.security.current-user.subject-claim") String subjectClaim
+            LoadCurrentUserPort loadCurrentUserPort,
+            MessageResolver messageResolver
     ) {
         this.securityIdentity = securityIdentity;
+        this.loadCurrentUserPort = loadCurrentUserPort;
         this.messageResolver = messageResolver;
-        this.userIdClaim = userIdClaim;
-        this.subjectClaim = subjectClaim;
     }
 
-    @Override
     public CurrentUser getCurrentUser() {
         if (securityIdentity == null || securityIdentity.isAnonymous()) {
             throw new UnauthenticatedException(
@@ -36,50 +31,17 @@ public class TokenCurrentUserProvider implements CurrentUserProvider {
             );
         }
 
-        Object claimValue = securityIdentity.getAttribute(userIdClaim);
+        String subject = securityIdentity.getPrincipal().getName();
 
-        if (claimValue == null) {
-            claimValue = securityIdentity.getAttribute(subjectClaim);
-        }
-
-        if (claimValue == null) {
+        if (subject == null || subject.isBlank()) {
             throw new UnauthenticatedException(
-                    messageResolver.get("error.current-user.missing-claim", userIdClaim)
+                    messageResolver.get("error.current-user.missing-claim", "sub")
             );
         }
 
-        return new CurrentUser(parseUserId(claimValue));
-    }
-
-    private Long parseUserId(Object claimValue) {
-        if (claimValue instanceof Number number) {
-            long userId = number.longValue();
-
-            if (userId <= 0) {
-                throw new UnauthenticatedException(
-                        messageResolver.get("error.current-user.invalid-claim", claimValue)
-                );
-            }
-
-            return userId;
-        }
-
-        String rawValue = String.valueOf(claimValue).trim();
-
-        try {
-            long userId = Long.parseLong(rawValue);
-
-            if (userId <= 0) {
-                throw new UnauthenticatedException(
-                        messageResolver.get("error.current-user.invalid-claim", rawValue)
-                );
-            }
-
-            return userId;
-        } catch (NumberFormatException exception) {
-            throw new UnauthenticatedException(
-                    messageResolver.get("error.current-user.invalid-claim", rawValue)
-            );
-        }
+        return loadCurrentUserPort.findCurrentUserByExternalSubject(subject)
+                .orElseThrow(() -> new UnauthenticatedException(
+                        messageResolver.get("error.current-user.not-linked", subject)
+                ));
     }
 }

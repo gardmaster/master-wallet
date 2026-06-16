@@ -1,6 +1,6 @@
 package com.gard.investmentmanager.shared.infrastructure.security;
 
-import com.gard.investmentmanager.shared.application.port.in.CurrentUserProvider;
+import com.gard.investmentmanager.shared.application.port.out.LoadCurrentUserPort;
 import com.gard.investmentmanager.shared.domain.CurrentUser;
 import com.gard.investmentmanager.shared.domain.UnauthenticatedException;
 import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
@@ -10,18 +10,22 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 
 @RequestScoped
-public class HeaderCurrentUserProvider implements CurrentUserProvider {
+public class HeaderCurrentUserProvider {
 
     @Context
     HttpHeaders httpHeaders;
 
+    private final LoadCurrentUserPort loadCurrentUserPort;
     private final MessageResolver messageResolver;
 
-    public HeaderCurrentUserProvider(MessageResolver messageResolver) {
+    public HeaderCurrentUserProvider(
+            LoadCurrentUserPort loadCurrentUserPort,
+            MessageResolver messageResolver
+    ) {
+        this.loadCurrentUserPort = loadCurrentUserPort;
         this.messageResolver = messageResolver;
     }
 
-    @Override
     public CurrentUser getCurrentUser() {
         String rawUserId = httpHeaders.getHeaderString(RequestHeaderNames.X_USER_ID);
 
@@ -40,7 +44,10 @@ public class HeaderCurrentUserProvider implements CurrentUserProvider {
                 );
             }
 
-            return new CurrentUser(userId);
+            return loadCurrentUserPort.findCurrentUserById(userId)
+                    .orElseThrow(() -> new UnauthenticatedException(
+                            messageResolver.get("error.current-user-id.invalid", rawUserId)
+                    ));
         } catch (NumberFormatException exception) {
             throw new UnauthenticatedException(
                     messageResolver.get("error.current-user-id.invalid", rawUserId)
