@@ -33,15 +33,15 @@ public class InstitutionPersistenceAdapter implements InstitutionPersistencePort
     }
 
     @Override
-    public List<Institution> findAllOrderedByName() {
+    public List<Institution> findAllOrderedByUserIdAndName(Long userId) {
         return institutionPersistenceMapper.toDomainList(
-                institutionPanacheRepository.listAllOrderedByName()
+                institutionPanacheRepository.listAllOrderedByUserIdAndName(userId)
         );
     }
 
     @Override
-    public Optional<Institution> findById(Long institutionId) {
-        return institutionPanacheRepository.findActiveByIdOptional(institutionId)
+    public Optional<Institution> findByIdAndUserId(Long institutionId, Long userId) {
+        return institutionPanacheRepository.findActiveByIdAndUserIdOptional(institutionId, userId)
                 .map(institutionPersistenceMapper::toDomain);
     }
 
@@ -52,7 +52,7 @@ public class InstitutionPersistenceAdapter implements InstitutionPersistencePort
         if (institution.id() == null) {
             entity = new InstitutionEntity();
         } else {
-            entity = institutionPanacheRepository.findActiveByIdOptional(institution.id())
+            entity = institutionPanacheRepository.findActiveByIdAndUserIdOptional(institution.id(), institution.userId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             messageResolver.get("error.institution.not-found", institution.id())
                     ));
@@ -74,7 +74,7 @@ public class InstitutionPersistenceAdapter implements InstitutionPersistencePort
     }
 
     @Override
-    public void softDeleteById(Long institutionId) {
-        institutionPanacheRepository.softDeleteById(institutionId, Instant.now());
+    public void softDeleteById(Long institutionId, Long userId) {
+        institutionPanacheRepository.softDeleteById(institutionId, userId, Instant.now());
     }
 }

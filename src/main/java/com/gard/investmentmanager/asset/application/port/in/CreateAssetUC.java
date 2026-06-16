@@ -4,5 +4,5 @@ import com.gard.investmentmanager.asset.domain.Asset;
 
 public interface CreateAssetUC {
 
-    Asset execute(CreateAssetCommand command);
+    Asset execute(Long currentUserId, CreateAssetCommand command);
 }

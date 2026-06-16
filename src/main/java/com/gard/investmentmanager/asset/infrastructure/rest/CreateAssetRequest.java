@@ -8,9 +8,6 @@ import jakarta.validation.constraints.Size;
 
 public record CreateAssetRequest(
         @NotNull(message = "{validation.not-null}")
-        Long userId,
-
-        @NotNull(message = "{validation.not-null}")
         AssetType assetType,
 
         @NotBlank(message = "{validation.not-blank}")

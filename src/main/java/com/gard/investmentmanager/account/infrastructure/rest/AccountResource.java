@@ -41,10 +41,10 @@ public class AccountResource implements AccountResourceContract {
     }
 
     @Override
-    public Response create(CreateAccountRequest request) {
+    public Response create(Long currentUserId, CreateAccountRequest request) {
         InvestmentAccount created = createAccountUC.execute(
+                currentUserId,
                 new CreateAccountCommand(
-                        request.userId(),
                         request.institutionId(),
                         request.name(),
                         request.accountType(),
@@ -61,19 +61,20 @@ public class AccountResource implements AccountResourceContract {
     }
 
     @Override
-    public List<AccountResponse> listAll() {
-        return accountRestMapper.toResponseList(listAccountsUC.execute());
+    public List<AccountResponse> listAll(Long currentUserId) {
+        return accountRestMapper.toResponseList(listAccountsUC.execute(currentUserId));
     }
 
     @Override
-    public AccountResponse getById(Long accountId) {
-        return accountRestMapper.toResponse(getAccountByIdUC.execute(accountId));
+    public AccountResponse getById(Long currentUserId, Long accountId) {
+        return accountRestMapper.toResponse(getAccountByIdUC.execute(currentUserId, accountId));
     }
 
     @Override
-    public AccountResponse update(Long accountId, UpdateAccountRequest request) {
+    public AccountResponse update(Long currentUserId, Long accountId, UpdateAccountRequest request) {
         return accountRestMapper.toResponse(
                 updateAccountUC.execute(
+                        currentUserId,
                         accountId,
                         new UpdateAccountCommand(
                                 request.institutionId(),
@@ -87,8 +88,8 @@ public class AccountResource implements AccountResourceContract {
     }
 
     @Override
-    public Response delete(Long accountId) {
-        deleteAccountUC.execute(accountId);
+    public Response delete(Long currentUserId, Long accountId) {
+        deleteAccountUC.execute(currentUserId, accountId);
         return Response.noContent().build();
     }
 }

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ListAccountsUC {
 
-    List<InvestmentAccount> execute();
+    List<InvestmentAccount> execute(Long currentUserId);
 }

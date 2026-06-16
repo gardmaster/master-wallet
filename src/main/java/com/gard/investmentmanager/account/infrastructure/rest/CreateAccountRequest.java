@@ -8,9 +8,6 @@ import jakarta.validation.constraints.Size;
 
 public record CreateAccountRequest(
         @NotNull(message = "{validation.not-null}")
-        Long userId,
-
-        @NotNull(message = "{validation.not-null}")
         Long institutionId,
 
         @NotBlank(message = "{validation.not-blank}")

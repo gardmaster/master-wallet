@@ -4,5 +4,5 @@ import com.gard.investmentmanager.asset.domain.Asset;
 
 public interface GetAssetByIdUC {
 
-    Asset execute(Long assetId);
+    Asset execute(Long currentUserId, Long assetId);
 }

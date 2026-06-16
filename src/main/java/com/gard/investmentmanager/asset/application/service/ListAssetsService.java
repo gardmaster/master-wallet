@@ -17,7 +17,7 @@ public class ListAssetsService implements ListAssetsUC {
     }
 
     @Override
-    public List<Asset> execute() {
-        return assetPersistencePort.findAllOrderedByName();
+    public List<Asset> execute(Long currentUserId) {
+        return assetPersistencePort.findAllOrderedByUserIdAndName(currentUserId);
     }
 }

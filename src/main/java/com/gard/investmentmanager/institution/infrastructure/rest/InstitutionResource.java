@@ -41,10 +41,10 @@ public class InstitutionResource implements InstitutionResourceContract {
     }
 
     @Override
-    public Response create(CreateInstitutionRequest request) {
+    public Response create(Long currentUserId, CreateInstitutionRequest request) {
         Institution created = createInstitutionUC.execute(
+                currentUserId,
                 new CreateInstitutionCommand(
-                        request.userId(),
                         request.name(),
                         request.institutionType(),
                         request.notes()
@@ -59,19 +59,20 @@ public class InstitutionResource implements InstitutionResourceContract {
     }
 
     @Override
-    public List<InstitutionResponse> listAll() {
-        return institutionRestMapper.toResponseList(listInstitutionsUC.execute());
+    public List<InstitutionResponse> listAll(Long currentUserId) {
+        return institutionRestMapper.toResponseList(listInstitutionsUC.execute(currentUserId));
     }
 
     @Override
-    public InstitutionResponse getById(Long institutionId) {
-        return institutionRestMapper.toResponse(getInstitutionByIdUC.execute(institutionId));
+    public InstitutionResponse getById(Long currentUserId, Long institutionId) {
+        return institutionRestMapper.toResponse(getInstitutionByIdUC.execute(currentUserId, institutionId));
     }
 
     @Override
-    public InstitutionResponse update(Long institutionId, UpdateInstitutionRequest request) {
+    public InstitutionResponse update(Long currentUserId, Long institutionId, UpdateInstitutionRequest request) {
         return institutionRestMapper.toResponse(
                 updateInstitutionUC.execute(
+                        currentUserId,
                         institutionId,
                         new UpdateInstitutionCommand(
                                 request.name(),
@@ -83,8 +84,8 @@ public class InstitutionResource implements InstitutionResourceContract {
     }
 
     @Override
-    public Response delete(Long institutionId) {
-        deleteInstitutionUC.execute(institutionId);
+    public Response delete(Long currentUserId, Long institutionId) {
+        deleteInstitutionUC.execute(currentUserId, institutionId);
         return Response.noContent().build();
     }
 }

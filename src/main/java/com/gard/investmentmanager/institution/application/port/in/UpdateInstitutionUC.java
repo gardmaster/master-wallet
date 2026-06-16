@@ -4,5 +4,5 @@ import com.gard.investmentmanager.institution.domain.Institution;
 
 public interface UpdateInstitutionUC {
 
-    Institution execute(Long institutionId, UpdateInstitutionCommand command);
+    Institution execute(Long currentUserId, Long institutionId, UpdateInstitutionCommand command);
 }

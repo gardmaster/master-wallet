@@ -41,10 +41,10 @@ public class AssetResource implements AssetResourceContract {
     }
 
     @Override
-    public Response create(CreateAssetRequest request) {
+    public Response create(Long currentUserId, CreateAssetRequest request) {
         Asset created = createAssetUC.execute(
+                currentUserId,
                 new CreateAssetCommand(
-                        request.userId(),
                         request.assetType(),
                         request.name(),
                         request.ticker(),
@@ -63,19 +63,20 @@ public class AssetResource implements AssetResourceContract {
     }
 
     @Override
-    public List<AssetResponse> listAll() {
-        return assetRestMapper.toResponseList(listAssetsUC.execute());
+    public List<AssetResponse> listAll(Long currentUserId) {
+        return assetRestMapper.toResponseList(listAssetsUC.execute(currentUserId));
     }
 
     @Override
-    public AssetResponse getById(Long assetId) {
-        return assetRestMapper.toResponse(getAssetByIdUC.execute(assetId));
+    public AssetResponse getById(Long currentUserId, Long assetId) {
+        return assetRestMapper.toResponse(getAssetByIdUC.execute(currentUserId, assetId));
     }
 
     @Override
-    public AssetResponse update(Long assetId, UpdateAssetRequest request) {
+    public AssetResponse update(Long currentUserId, Long assetId, UpdateAssetRequest request) {
         return assetRestMapper.toResponse(
                 updateAssetUC.execute(
+                        currentUserId,
                         assetId,
                         new UpdateAssetCommand(
                                 request.assetType(),
@@ -91,8 +92,8 @@ public class AssetResource implements AssetResourceContract {
     }
 
     @Override
-    public Response delete(Long assetId) {
-        deleteAssetUC.execute(assetId);
+    public Response delete(Long currentUserId, Long assetId) {
+        deleteAssetUC.execute(currentUserId, assetId);
         return Response.noContent().build();
     }
 }

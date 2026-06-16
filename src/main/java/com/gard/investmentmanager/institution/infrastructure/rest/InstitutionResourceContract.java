@@ -1,9 +1,12 @@
 package com.gard.investmentmanager.institution.infrastructure.rest;
 
+import com.gard.investmentmanager.shared.infrastructure.rest.RequestHeaderNames;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -24,27 +27,49 @@ public interface InstitutionResourceContract {
 
     @POST
     @Operation(summary = "Create institution")
-    Response create(@Valid CreateInstitutionRequest request);
+    Response create(
+            @HeaderParam(RequestHeaderNames.X_USER_ID)
+            @NotNull(message = "{validation.not-null}")
+            Long currentUserId,
+            @Valid CreateInstitutionRequest request
+    );
 
     @GET
-    @Operation(summary = "List all institutions")
-    List<InstitutionResponse> listAll();
+    @Operation(summary = "List all institutions from current user")
+    List<InstitutionResponse> listAll(
+            @HeaderParam(RequestHeaderNames.X_USER_ID)
+            @NotNull(message = "{validation.not-null}")
+            Long currentUserId
+    );
 
     @GET
     @Path("/{institutionId}")
-    @Operation(summary = "Get institution by id")
-    InstitutionResponse getById(@PathParam("institutionId") Long institutionId);
+    @Operation(summary = "Get institution by id from current user")
+    InstitutionResponse getById(
+            @HeaderParam(RequestHeaderNames.X_USER_ID)
+            @NotNull(message = "{validation.not-null}")
+            Long currentUserId,
+            @PathParam("institutionId") Long institutionId
+    );
 
     @PUT
     @Path("/{institutionId}")
-    @Operation(summary = "Update institution")
+    @Operation(summary = "Update institution from current user")
     InstitutionResponse update(
+            @HeaderParam(RequestHeaderNames.X_USER_ID)
+            @NotNull(message = "{validation.not-null}")
+            Long currentUserId,
             @PathParam("institutionId") Long institutionId,
             @Valid UpdateInstitutionRequest request
     );
 
     @DELETE
     @Path("/{institutionId}")
-    @Operation(summary = "Delete institution")
-    Response delete(@PathParam("institutionId") Long institutionId);
+    @Operation(summary = "Delete institution from current user")
+    Response delete(
+            @HeaderParam(RequestHeaderNames.X_USER_ID)
+            @NotNull(message = "{validation.not-null}")
+            Long currentUserId,
+            @PathParam("institutionId") Long institutionId
+    );
 }

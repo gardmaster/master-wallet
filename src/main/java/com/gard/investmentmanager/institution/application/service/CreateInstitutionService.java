@@ -31,10 +31,10 @@ public class CreateInstitutionService implements CreateInstitutionUC {
 
     @Override
     @Transactional
-    public Institution execute(CreateInstitutionCommand command) {
-        if (!loadUserPort.existsById(command.userId())) {
+    public Institution execute(Long currentUserId, CreateInstitutionCommand command) {
+        if (!loadUserPort.existsById(currentUserId)) {
             throw new ResourceNotFoundException(
-                    messageResolver.get("error.user.not-found", command.userId())
+                    messageResolver.get("error.user.not-found", currentUserId)
             );
         }
 
@@ -42,7 +42,7 @@ public class CreateInstitutionService implements CreateInstitutionUC {
 
         Institution institution = new Institution(
                 null,
-                command.userId(),
+                currentUserId,
                 command.name().trim(),
                 command.institutionType(),
                 normalizeNullable(command.notes()),

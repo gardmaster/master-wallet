@@ -36,14 +36,14 @@ public class CreateAccountService implements CreateAccountUC {
 
     @Override
     @Transactional
-    public InvestmentAccount execute(CreateAccountCommand command) {
-        if (!loadUserPort.existsById(command.userId())) {
+    public InvestmentAccount execute(Long currentUserId, CreateAccountCommand command) {
+        if (!loadUserPort.existsById(currentUserId)) {
             throw new ResourceNotFoundException(
-                    messageResolver.get("error.user.not-found", command.userId())
+                    messageResolver.get("error.user.not-found", currentUserId)
             );
         }
 
-        if (!loadAccountReferencePort.institutionBelongsToUser(command.institutionId(), command.userId())) {
+        if (!loadAccountReferencePort.institutionBelongsToUser(command.institutionId(), currentUserId)) {
             throw new BusinessException(
                     messageResolver.get("error.institution.not-belong-to-user", command.institutionId())
             );
@@ -53,7 +53,7 @@ public class CreateAccountService implements CreateAccountUC {
 
         InvestmentAccount account = new InvestmentAccount(
                 null,
-                command.userId(),
+                currentUserId,
                 command.institutionId(),
                 command.name().trim(),
                 command.accountType(),

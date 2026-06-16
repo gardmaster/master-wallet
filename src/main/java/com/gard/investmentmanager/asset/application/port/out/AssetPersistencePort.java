@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface AssetPersistencePort {
 
-    List<Asset> findAllOrderedByName();
+    List<Asset> findAllOrderedByUserIdAndName(Long userId);
 
-    Optional<Asset> findById(Long assetId);
+    Optional<Asset> findByIdAndUserId(Long assetId, Long userId);
 
     Asset save(Asset asset);
 
-    void softDeleteById(Long assetId);
+    void softDeleteById(Long assetId, Long userId);
 }

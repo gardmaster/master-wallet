@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record AssetResponse(
         Long id,
-        Long userId,
         AssetType assetType,
         String name,
         String ticker,

@@ -22,8 +22,8 @@ public class GetAssetByIdService implements GetAssetByIdUC {
     }
 
     @Override
-    public Asset execute(Long assetId) {
-        return assetPersistencePort.findById(assetId)
+    public Asset execute(Long currentUserId, Long assetId) {
+        return assetPersistencePort.findByIdAndUserId(assetId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.asset.not-found", assetId)
                 ));

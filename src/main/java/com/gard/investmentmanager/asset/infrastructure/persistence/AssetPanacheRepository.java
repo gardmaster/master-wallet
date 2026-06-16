@@ -10,15 +10,21 @@ import java.util.Optional;
 @ApplicationScoped
 public class AssetPanacheRepository implements PanacheRepositoryBase<AssetEntity, Long> {
 
-    public List<AssetEntity> listAllOrderedByName() {
-        return find("deletedAt is null order by name asc").list();
+    public List<AssetEntity> listAllOrderedByUserIdAndName(Long userId) {
+        return find("user.id = ?1 and deletedAt is null order by name asc", userId).list();
     }
 
-    public Optional<AssetEntity> findActiveByIdOptional(Long assetId) {
-        return find("id = ?1 and deletedAt is null", assetId).firstResultOptional();
+    public Optional<AssetEntity> findActiveByIdAndUserIdOptional(Long assetId, Long userId) {
+        return find("id = ?1 and user.id = ?2 and deletedAt is null", assetId, userId)
+                .firstResultOptional();
     }
 
-    public void softDeleteById(Long assetId, Instant deletedAt) {
-        update("deletedAt = ?1 where id = ?2 and deletedAt is null", deletedAt, assetId);
+    public void softDeleteById(Long assetId, Long userId, Instant deletedAt) {
+        update(
+                "deletedAt = ?1 where id = ?2 and user.id = ?3 and deletedAt is null",
+                deletedAt,
+                assetId,
+                userId
+        );
     }
 }

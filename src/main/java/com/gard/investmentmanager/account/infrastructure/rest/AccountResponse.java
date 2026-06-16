@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record AccountResponse(
         Long id,
-        Long userId,
         Long institutionId,
         String name,
         AccountType accountType,

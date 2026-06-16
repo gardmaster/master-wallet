@@ -32,13 +32,13 @@ public class UpdateAccountService implements UpdateAccountUC {
 
     @Override
     @Transactional
-    public InvestmentAccount execute(Long accountId, UpdateAccountCommand command) {
-        InvestmentAccount current = accountPersistencePort.findById(accountId)
+    public InvestmentAccount execute(Long currentUserId, Long accountId, UpdateAccountCommand command) {
+        InvestmentAccount current = accountPersistencePort.findByIdAndUserId(accountId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.account.not-found", accountId)
                 ));
 
-        if (!loadAccountReferencePort.institutionBelongsToUser(command.institutionId(), current.userId())) {
+        if (!loadAccountReferencePort.institutionBelongsToUser(command.institutionId(), currentUserId)) {
             throw new BusinessException(
                     messageResolver.get("error.institution.not-belong-to-user", command.institutionId())
             );

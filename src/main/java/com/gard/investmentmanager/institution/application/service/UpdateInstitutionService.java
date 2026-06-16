@@ -27,8 +27,8 @@ public class UpdateInstitutionService implements UpdateInstitutionUC {
 
     @Override
     @Transactional
-    public Institution execute(Long institutionId, UpdateInstitutionCommand command) {
-        Institution current = institutionPersistencePort.findById(institutionId)
+    public Institution execute(Long currentUserId, Long institutionId, UpdateInstitutionCommand command) {
+        Institution current = institutionPersistencePort.findByIdAndUserId(institutionId, currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         messageResolver.get("error.institution.not-found", institutionId)
                 ));

@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface InstitutionPersistencePort {
 
-    List<Institution> findAllOrderedByName();
+    List<Institution> findAllOrderedByUserIdAndName(Long userId);
 
-    Optional<Institution> findById(Long institutionId);
+    Optional<Institution> findByIdAndUserId(Long institutionId, Long userId);
 
     Institution save(Institution institution);
 
-    void softDeleteById(Long institutionId);
+    void softDeleteById(Long institutionId, Long userId);
 }

@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record InstitutionResponse(
         Long id,
-        Long userId,
         String name,
         InstitutionType institutionType,
         String notes,
