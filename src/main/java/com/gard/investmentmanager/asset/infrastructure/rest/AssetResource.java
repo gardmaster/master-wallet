@@ -8,6 +8,7 @@ import com.gard.investmentmanager.asset.application.port.in.ListAssetsUC;
 import com.gard.investmentmanager.asset.application.port.in.UpdateAssetCommand;
 import com.gard.investmentmanager.asset.application.port.in.UpdateAssetUC;
 import com.gard.investmentmanager.asset.domain.Asset;
+import com.gard.investmentmanager.shared.application.port.in.CurrentUserProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Response;
 
@@ -23,6 +24,7 @@ public class AssetResource implements AssetResourceContract {
     private final UpdateAssetUC updateAssetUC;
     private final DeleteAssetUC deleteAssetUC;
     private final AssetRestMapper assetRestMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public AssetResource(
             CreateAssetUC createAssetUC,
@@ -30,7 +32,8 @@ public class AssetResource implements AssetResourceContract {
             GetAssetByIdUC getAssetByIdUC,
             UpdateAssetUC updateAssetUC,
             DeleteAssetUC deleteAssetUC,
-            AssetRestMapper assetRestMapper
+            AssetRestMapper assetRestMapper,
+            CurrentUserProvider currentUserProvider
     ) {
         this.createAssetUC = createAssetUC;
         this.listAssetsUC = listAssetsUC;
@@ -38,10 +41,13 @@ public class AssetResource implements AssetResourceContract {
         this.updateAssetUC = updateAssetUC;
         this.deleteAssetUC = deleteAssetUC;
         this.assetRestMapper = assetRestMapper;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @Override
-    public Response create(Long currentUserId, CreateAssetRequest request) {
+    public Response create(CreateAssetRequest request) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
+
         Asset created = createAssetUC.execute(
                 currentUserId,
                 new CreateAssetCommand(
@@ -63,17 +69,21 @@ public class AssetResource implements AssetResourceContract {
     }
 
     @Override
-    public List<AssetResponse> listAll(Long currentUserId) {
+    public List<AssetResponse> listAll() {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         return assetRestMapper.toResponseList(listAssetsUC.execute(currentUserId));
     }
 
     @Override
-    public AssetResponse getById(Long currentUserId, Long assetId) {
+    public AssetResponse getById(Long assetId) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         return assetRestMapper.toResponse(getAssetByIdUC.execute(currentUserId, assetId));
     }
 
     @Override
-    public AssetResponse update(Long currentUserId, Long assetId, UpdateAssetRequest request) {
+    public AssetResponse update(Long assetId, UpdateAssetRequest request) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
+
         return assetRestMapper.toResponse(
                 updateAssetUC.execute(
                         currentUserId,
@@ -92,7 +102,8 @@ public class AssetResource implements AssetResourceContract {
     }
 
     @Override
-    public Response delete(Long currentUserId, Long assetId) {
+    public Response delete(Long assetId) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         deleteAssetUC.execute(currentUserId, assetId);
         return Response.noContent().build();
     }

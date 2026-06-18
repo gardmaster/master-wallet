@@ -8,6 +8,7 @@ import com.gard.investmentmanager.institution.application.port.in.ListInstitutio
 import com.gard.investmentmanager.institution.application.port.in.UpdateInstitutionCommand;
 import com.gard.investmentmanager.institution.application.port.in.UpdateInstitutionUC;
 import com.gard.investmentmanager.institution.domain.Institution;
+import com.gard.investmentmanager.shared.application.port.in.CurrentUserProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Response;
 
@@ -23,6 +24,7 @@ public class InstitutionResource implements InstitutionResourceContract {
     private final UpdateInstitutionUC updateInstitutionUC;
     private final DeleteInstitutionUC deleteInstitutionUC;
     private final InstitutionRestMapper institutionRestMapper;
+    private final CurrentUserProvider currentUserProvider;
 
     public InstitutionResource(
             CreateInstitutionUC createInstitutionUC,
@@ -30,7 +32,8 @@ public class InstitutionResource implements InstitutionResourceContract {
             GetInstitutionByIdUC getInstitutionByIdUC,
             UpdateInstitutionUC updateInstitutionUC,
             DeleteInstitutionUC deleteInstitutionUC,
-            InstitutionRestMapper institutionRestMapper
+            InstitutionRestMapper institutionRestMapper,
+            CurrentUserProvider currentUserProvider
     ) {
         this.createInstitutionUC = createInstitutionUC;
         this.listInstitutionsUC = listInstitutionsUC;
@@ -38,10 +41,13 @@ public class InstitutionResource implements InstitutionResourceContract {
         this.updateInstitutionUC = updateInstitutionUC;
         this.deleteInstitutionUC = deleteInstitutionUC;
         this.institutionRestMapper = institutionRestMapper;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @Override
-    public Response create(Long currentUserId, CreateInstitutionRequest request) {
+    public Response create(CreateInstitutionRequest request) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
+
         Institution created = createInstitutionUC.execute(
                 currentUserId,
                 new CreateInstitutionCommand(
@@ -59,17 +65,21 @@ public class InstitutionResource implements InstitutionResourceContract {
     }
 
     @Override
-    public List<InstitutionResponse> listAll(Long currentUserId) {
+    public List<InstitutionResponse> listAll() {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         return institutionRestMapper.toResponseList(listInstitutionsUC.execute(currentUserId));
     }
 
     @Override
-    public InstitutionResponse getById(Long currentUserId, Long institutionId) {
+    public InstitutionResponse getById(Long institutionId) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         return institutionRestMapper.toResponse(getInstitutionByIdUC.execute(currentUserId, institutionId));
     }
 
     @Override
-    public InstitutionResponse update(Long currentUserId, Long institutionId, UpdateInstitutionRequest request) {
+    public InstitutionResponse update(Long institutionId, UpdateInstitutionRequest request) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
+
         return institutionRestMapper.toResponse(
                 updateInstitutionUC.execute(
                         currentUserId,
@@ -84,7 +94,8 @@ public class InstitutionResource implements InstitutionResourceContract {
     }
 
     @Override
-    public Response delete(Long currentUserId, Long institutionId) {
+    public Response delete(Long institutionId) {
+        Long currentUserId = currentUserProvider.getCurrentUser().id();
         deleteInstitutionUC.execute(currentUserId, institutionId);
         return Response.noContent().build();
     }

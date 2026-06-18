@@ -1,6 +1,11 @@
 package com.gard.investmentmanager.auth.infrastructure.persistence;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.Instant;
 
@@ -18,8 +23,11 @@ public class UserEntity {
     @Column(nullable = false, length = 255, unique = true)
     public String email;
 
-    @Column(name = "password_hash_or_external_auth_id", nullable = false, length = 255)
+    @Column(name = "password_hash_or_external_auth_id", length = 255)
     public String passwordHashOrExternalAuthId;
+
+    @Column(name = "external_subject", length = 255, unique = true)
+    public String externalSubject;
 
     @Column(name = "created_at", nullable = false)
     public Instant createdAt;

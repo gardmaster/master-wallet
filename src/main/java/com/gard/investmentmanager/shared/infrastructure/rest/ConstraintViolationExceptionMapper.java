@@ -2,7 +2,6 @@ package com.gard.investmentmanager.shared.infrastructure.rest;
 
 import com.gard.investmentmanager.shared.infrastructure.i18n.MessageResolver;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Response;
@@ -15,8 +14,11 @@ import java.util.List;
 @ApplicationScoped
 public class ConstraintViolationExceptionMapper extends BaseProblemDetailsExceptionMapper<ConstraintViolationException> {
 
-    @Inject
-    MessageResolver messageResolver;
+    private final MessageResolver messageResolver;
+
+    public ConstraintViolationExceptionMapper(MessageResolver messageResolver) {
+        this.messageResolver = messageResolver;
+    }
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
