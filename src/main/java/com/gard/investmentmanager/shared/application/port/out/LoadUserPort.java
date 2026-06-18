@@ -1,12 +1,6 @@
 package com.gard.investmentmanager.shared.application.port.out;
 
-import com.gard.investmentmanager.shared.domain.CurrentUser;
+public interface LoadUserPort {
 
-import java.util.Optional;
-
-public interface LoadCurrentUserPort {
-
-    Optional<CurrentUser> findCurrentUserById(Long userId);
-
-    Optional<CurrentUser> findCurrentUserByExternalSubject(String externalSubject);
+    boolean existsById(Long userId);
 }

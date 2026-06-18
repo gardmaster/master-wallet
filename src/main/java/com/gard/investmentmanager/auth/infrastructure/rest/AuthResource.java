@@ -30,7 +30,8 @@ public class AuthResource implements AuthResourceContract {
     public Response register(RegisterUserRequest request) {
         User created = registerUserUC.execute(
                 new RegisterUserCommand(
-                        request.name(),
+                        request.firstName(),
+                        request.lastName(),
                         request.email(),
                         request.password()
                 )

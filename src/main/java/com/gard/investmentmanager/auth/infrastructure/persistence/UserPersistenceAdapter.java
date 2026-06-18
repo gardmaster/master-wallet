@@ -3,6 +3,7 @@ package com.gard.investmentmanager.auth.infrastructure.persistence;
 import com.gard.investmentmanager.auth.application.port.out.UserPersistencePort;
 import com.gard.investmentmanager.auth.domain.User;
 import com.gard.investmentmanager.shared.application.port.out.LoadCurrentUserPort;
+import com.gard.investmentmanager.shared.application.port.out.LoadUserPort;
 import com.gard.investmentmanager.shared.domain.CurrentUser;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -10,7 +11,7 @@ import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
 @ApplicationScoped
-public class UserPersistenceAdapter implements UserPersistencePort, LoadCurrentUserPort {
+public class UserPersistenceAdapter implements UserPersistencePort, LoadCurrentUserPort, LoadUserPort {
 
     private final EntityManager entityManager;
     private final UserPersistenceMapper userPersistenceMapper;
@@ -28,6 +29,19 @@ public class UserPersistenceAdapter implements UserPersistencePort, LoadCurrentU
                 where lower(u.email) = lower(:email)
                 """, Long.class)
                 .setParameter("email", email)
+                .getSingleResult();
+
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsById(Long userId) {
+        Long count = entityManager.createQuery("""
+                select count(u)
+                from UserEntity u
+                where u.id = :userId
+                """, Long.class)
+                .setParameter("userId", userId)
                 .getSingleResult();
 
         return count != null && count > 0;

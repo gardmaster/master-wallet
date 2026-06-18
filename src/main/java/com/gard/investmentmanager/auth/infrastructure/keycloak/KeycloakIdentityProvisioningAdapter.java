@@ -53,9 +53,17 @@ public class KeycloakIdentityProvisioningAdapter implements IdentityProvisioning
         KeycloakCreateUserRequest requestBody = new KeycloakCreateUserRequest(
                 command.email().trim().toLowerCase(),
                 command.email().trim().toLowerCase(),
+                command.firstName().trim(),
+                command.lastName().trim(),
                 true,
                 true,
-                List.of(new KeycloakCredentialRequest("password", command.password(), false))
+                List.of(
+                        new KeycloakCredentialRequest(
+                                "password",
+                                command.password(),
+                                false
+                        )
+                )
         );
 
         try {
@@ -81,7 +89,11 @@ public class KeycloakIdentityProvisioningAdapter implements IdentityProvisioning
             throw new IdentityProviderException(
                     messageResolver.get("error.keycloak.user-creation-failed")
             );
-        } catch (IOException | InterruptedException exception) {
+        } catch (IOException exception) {
+            throw new IdentityProviderException(
+                    messageResolver.get("error.keycloak.user-creation-failed")
+            );
+        } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IdentityProviderException(
                     messageResolver.get("error.keycloak.user-creation-failed")
@@ -107,7 +119,11 @@ public class KeycloakIdentityProvisioningAdapter implements IdentityProvisioning
                         messageResolver.get("error.keycloak.user-deletion-failed", externalSubject)
                 );
             }
-        } catch (IOException | InterruptedException exception) {
+        } catch (IOException exception) {
+            throw new IdentityProviderException(
+                    messageResolver.get("error.keycloak.user-deletion-failed", externalSubject)
+            );
+        } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IdentityProviderException(
                     messageResolver.get("error.keycloak.user-deletion-failed", externalSubject)
@@ -137,7 +153,11 @@ public class KeycloakIdentityProvisioningAdapter implements IdentityProvisioning
 
             KeycloakTokenResponse tokenResponse = objectMapper.readValue(response.body(), KeycloakTokenResponse.class);
             return tokenResponse.accessToken();
-        } catch (IOException | InterruptedException exception) {
+        } catch (IOException exception) {
+            throw new IdentityProviderException(
+                    messageResolver.get("error.keycloak.admin-token-failed")
+            );
+        } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IdentityProviderException(
                     messageResolver.get("error.keycloak.admin-token-failed")

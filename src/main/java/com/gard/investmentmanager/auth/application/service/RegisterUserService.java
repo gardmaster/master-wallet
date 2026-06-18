@@ -32,21 +32,33 @@ public class RegisterUserService implements RegisterUserUC {
     @Override
     @Transactional
     public User execute(RegisterUserCommand command) {
-        if (userPersistencePort.existsByEmail(command.email())) {
+        String normalizedEmail = command.email().trim().toLowerCase();
+        String normalizedFirstName = command.firstName().trim();
+        String normalizedLastName = command.lastName().trim();
+        String fullName = normalizedFirstName + " " + normalizedLastName;
+
+        if (userPersistencePort.existsByEmail(normalizedEmail)) {
             throw new BusinessException(
-                    messageResolver.get("error.user.email-already-exists", command.email())
+                    messageResolver.get("error.user.email-already-exists", normalizedEmail)
             );
         }
 
-        String externalSubject = identityProvisioningPort.createUser(command);
+        RegisterUserCommand normalizedCommand = new RegisterUserCommand(
+                normalizedFirstName,
+                normalizedLastName,
+                normalizedEmail,
+                command.password()
+        );
+
+        String externalSubject = identityProvisioningPort.createUser(normalizedCommand);
 
         try {
             Instant now = Instant.now();
 
             User user = new User(
                     null,
-                    command.name().trim(),
-                    command.email().trim().toLowerCase(),
+                    fullName,
+                    normalizedEmail,
                     externalSubject,
                     now,
                     now
